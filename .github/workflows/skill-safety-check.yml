@@ -1,0 +1,36 @@
+name: Skill Safety Check
+
+on:
+  schedule:
+    # Nightly at 03:00 UTC
+    - cron: '0 3 * * *'
+  push:
+    paths:
+      - 'skills/**'
+      - 'lib/skill-safety-checker.js'
+      - 'commands/check-skills.js'
+  pull_request:
+    paths:
+      - 'skills/**'
+      - 'lib/skill-safety-checker.js'
+      - 'commands/check-skills.js'
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Validate Skills
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run skill safety check
+        run: node commands/check-skills.js --dirs skills --ci
